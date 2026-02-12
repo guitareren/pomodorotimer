@@ -108,26 +108,30 @@
       background-color: #fff;
     }
 
-    /* Progress bar styling */
-    #progress-container {
-      width: 80%;
-      height: 20px;
-      background: #ddd;
-      border-radius: 10px;
-      margin: 20px auto;
-      overflow: hidden;
-    }
-    #progress-bar {
-      height: 100%;
-      width: 100%;
-      transition: width 1s linear, background 0.3s;
-    }
-    .light #progress-bar {
-      background: linear-gradient(135deg, #4cafef, #0077cc); /* Blue bar */
-    }
-    .dark #progress-bar {
-      background: linear-gradient(135deg, #6a1b9a, #4a148c); /* Dark purple bar */
-    }
+/* Progress bar styling */
+#progress-container {
+  width: 80%;
+  max-width: 600px;   /* Limit width on wide screens */
+  height: 20px;
+  background: #ddd;
+  border-radius: 10px;
+  margin: 20px auto;
+  overflow: hidden;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 100%;
+  transition: width 1s linear, background 0.3s;
+}
+
+.light #progress-bar {
+  background: linear-gradient(135deg, #4cafef, #0077cc); /* Blue bar */
+}
+
+.dark #progress-bar {
+  background: linear-gradient(135deg, #6a1b9a, #4a148c); /* Dark purple bar */
+}
   </style>
 </head>
 <body class="dark"> <!-- Start in dark mode -->
