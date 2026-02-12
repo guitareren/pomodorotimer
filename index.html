@@ -8,8 +8,12 @@
       font-family: Arial, sans-serif; 
       text-align: center; 
       margin: 20px; 
-      padding-top: 40px; /* Add space at the top */
-      transition: background 0.3s, color 0.3s, transform 0.3s;
+      padding-top: 40px; 
+      transition: background 0.3s, color 0.3s;
+    }
+    #app {
+      display: inline-block;
+      transition: transform 0.3s;
     }
     #timer { font-size: 48px; margin: 20px; }
 
@@ -49,7 +53,7 @@
       background: linear-gradient(135deg, #8e24aa, #6a1b9a);
     }
 
-    /* Modern input styling */
+    /* Input styling */
     .duration-label {
       font-size: 16px;
       font-weight: 600;
@@ -58,7 +62,6 @@
     input[type="number"] {
       width: 70px;
       padding: 8px;
-      border: 2px solid #0077cc;
       border-radius: 6px;
       font-size: 16px;
       text-align: center;
@@ -66,53 +69,87 @@
       transition: border-color 0.3s, box-shadow 0.3s;
     }
     input[type="number"]:focus {
-      border-color: #4cafef;
       box-shadow: 0 0 6px rgba(76, 175, 239, 0.6);
+    }
+
+    /* Light theme input colors */
+    body.light #work,
+    body.light #break {
+      border: 2px solid #0077cc; /* blue */
+    }
+
+    /* Dark theme input colors */
+    body.dark #work,
+    body.dark #break {
+      border: 2px solid #6a1b9a; /* purple */
     }
 
     .dark { background: #222; color: #eee; }
     .light { background: #fff; color: #000; }
 
     /* Switch styling */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 20px;
-      margin-left: 10px;
-      vertical-align: middle;
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0; /* gizle ama DOM’da kalsın */
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background-color: #444;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+/* checked olduğunda kaydır */
+.switch input:checked + .slider {
+  background-color: #6a1b9a; /* örnek: dark theme */
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+
+    /* Light theme switch colors */
+    body.light .switch .slider {
+      background-color: #0077cc; /* blue */
     }
-    .switch input { display: none; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
+    body.light .switch .slider:before {
       background-color: #fff;
-      transition: .4s;
-      border-radius: 20px;
-      border: 1px solid #444;
     }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 14px; width: 14px;
-      left: 3px; bottom: 3px;
-      background-color: #444;
-      transition: .4s;
-      border-radius: 50%;
+
+    /* Dark theme switch colors */
+    body.dark .switch .slider {
+      background-color: #6a1b9a; /* purple */
     }
-    input:checked + .slider {
-      background-color: #222;
-    }
-    input:checked + .slider:before {
-      transform: translateX(20px);
+    body.dark .switch .slider:before {
       background-color: #fff;
     }
 
     /* Progress bar styling */
     #progress-container {
       width: 80%;
-      max-width: 600px;   /* Limit width on wide screens */
+      max-width: 600px;
       height: 20px;
       background: #ddd;
       border-radius: 10px;
@@ -132,198 +169,139 @@
     }
   </style>
 </head>
-<body class="dark"> <!-- Start in dark mode -->
-  <h1>
-    Pomodoro Timer
-    <label class="switch">
-      <input type="checkbox" id="themeSwitch" checked onchange="toggleTheme()">
-      <span class="slider"></span>
-    </label>
-  </h1>
-  
-  <label class="duration-label">Work Duration:</label>
-  <input type="number" id="work" value="25"> min  
-  <br><br>
-  <label class="duration-label">Break Duration:</label>
-  <input type="number" id="break" value="5"> min  
-  <br><br>
-  
-  <div id="timer">25:00</div>
-  
-  <!-- Progress bar -->
-  <div id="progress-container">
-    <div id="progress-bar"></div>
+<body class="dark">
+  <div id="app">
+    <h1>
+      Pomodoro Timer
+<label class="switch">
+  <input type="checkbox" id="themeSwitch" onchange="toggleTheme()">
+  <span class="slider"></span>
+</label>
+
+    </h1>
+    
+    <label class="duration-label">Work Duration:</label>
+    <input type="number" id="work" value="25"> min  
+    <br><br>
+    <label class="duration-label">Break Duration:</label>
+    <input type="number" id="break" value="5"> min  
+    <br><br>
+    
+    <div id="timer">25:00</div>
+    
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+    
+    <button onclick="startTimer()">Start</button>
+    <button onclick="pauseTimer()">Pause</button>
+    <button onclick="resetTimer()">Reset</button>
+    <button onclick="resetStats()">Reset Pomodoro Count</button>
+    <br><br>
+    <button onclick="zoomIn()">Zoom In</button>
+    <button onclick="zoomOut()">Zoom Out</button>
+    
+    <p>Completed Pomodoros: <span id="stats">0</span></p>
   </div>
-  
-  <button onclick="startTimer()">Start</button>
-  <button onclick="pauseTimer()">Pause</button>
-  <button onclick="resetTimer()">Reset</button>
-  <button onclick="resetStats()">Reset Pomodoro Count</button>
-  <br><br>
-  <!-- UI scaling buttons -->
-  <button onclick="zoomIn()">Zoom In</button>
-  <button onclick="zoomOut()">Zoom Out</button>
-  
-  <p>Completed Pomodoros: <span id="stats">0</span></p>
-  
+
   <audio id="alarm" src="alarm.mp3"></audio>
-  
 
-<style>
-/* Inputs styled per theme */
-input[type="number"] {
-  width: 70px;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 16px;
-  text-align: center;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-input[type="number"]:focus {
-  box-shadow: 0 0 6px rgba(76, 175, 239, 0.6);
-}
-
-/* Light theme input colors */
-.light #work,
-.light #break {
-  border: 2px solid #0077cc; /* blue */
-}
-
-/* Dark theme input colors */
-.dark #work,
-.dark #break {
-  border: 2px solid #6a1b9a; /* purple */
-}
-
-/* Switch styling */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 20px;
-  margin-left: 10px;
-  vertical-align: middle;
-}
-.switch input { display: none; }
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  transition: .4s;
-  border-radius: 20px;
-  border: 1px solid #444;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 14px; width: 14px;
-  left: 3px; bottom: 3px;
-  transition: .4s;
-  border-radius: 50%;
-}
-
-/* Light theme switch colors */
-body.light .switch .slider {
-  background-color: #0077cc; /* blue */
-}
-body.light .switch .slider:before {
-  background-color: #fff;
-}
-
-/* Dark theme switch colors */
-body.dark .switch .slider {
-  background-color: #6a1b9a; /* purple */
-}
-body.dark .switch .slider:before {
-  background-color: #fff;
-}
-
-
-</style>
-
-<script>
-  let timerInterval, timeLeft, isWork = true;
-  let stats = localStorage.getItem("pomodoroCount") || 0;
-  document.getElementById("stats").textContent = stats;
-
-  function startTimer() {
-    if (timeLeft === undefined || timeLeft <= 0) {
-      let minutes = isWork ? document.getElementById("work").value : document.getElementById("break").value;
-      timeLeft = minutes * 60;
-    }
-    clearInterval(timerInterval);
-    timerInterval = setInterval(updateTimer, 1000);
-  }
-
-  function updateTimer() {
-    let mins = Math.floor(timeLeft / 60);
-    let secs = timeLeft % 60;
-    document.getElementById("timer").textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-
-    let total = (isWork ? document.getElementById("work").value : document.getElementById("break").value) * 60;
-    let progress = (timeLeft / total) * 100;
-    document.getElementById("progress-bar").style.width = progress + "%";
-
-    timeLeft--;
-    if (timeLeft < 0) {
-      clearInterval(timerInterval);
-      document.getElementById("alarm").play();
-      alert(isWork ? "Work session finished! Time for a break." : "Break finished! Back to work.");
-      if (isWork) {
-        stats++;
-        localStorage.setItem("pomodoroCount", stats);
-        document.getElementById("stats").textContent = stats;
-      }
-      isWork = !isWork;
-      timeLeft = undefined;
-      startTimer();
-    }
-  }
-
-  function pauseTimer() { clearInterval(timerInterval); }
-  function resetTimer() {
-    clearInterval(timerInterval);
-    let minutes = document.getElementById("work").value;
-    timeLeft = minutes * 60;
-    document.getElementById("timer").textContent = `${minutes}:00`;
-    document.getElementById("progress-bar").style.width = "100%";
-    isWork = true;
-  }
-
-  function toggleTheme() {
-    let body = document.body;
-    let switchEl = document.getElementById("themeSwitch");
-    if (switchEl.checked) {
-      body.className = "dark";
-    } else {
-      body.className = "light";
-    }
-  }
-
-  function resetStats() {
-    stats = 0;
-    localStorage.setItem("pomodoroCount", stats);
+  <script>
+    let timerInterval, timeLeft, isWork = true;
+    let stats = localStorage.getItem("pomodoroCount") || 0;
     document.getElementById("stats").textContent = stats;
-  }
 
-  // Auto-update timer when durations change
-  document.getElementById("work").addEventListener("input", () => {
-    if (isWork) {
-      timeLeft = document.getElementById("work").value * 60;
-      document.getElementById("timer").textContent = `${document.getElementById("work").value}:00`;
-      document.getElementById("progress-bar").style.width = "100%";
+    function startTimer() {
+      if (timeLeft === undefined || timeLeft <= 0) {
+        let minutes = isWork ? document.getElementById("work").value : document.getElementById("break").value;
+        timeLeft = minutes * 60;
+      }
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
     }
-  });
 
-  document.getElementById("break").addEventListener("input", () => {
-    if (!isWork) {
-      timeLeft = document.getElementById("break").value * 60;
-      document.getElementById("timer").textContent = `${document.getElementById("break").value}:00`;
-      document.getElementById("progress-bar").style.width = "100%";
+    function updateTimer() {
+      let mins = Math.floor(timeLeft / 60);
+      let secs = timeLeft % 60;
+      document.getElementById("timer").textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+
+      let total = (isWork ? document.getElementById("work").value : document.getElementById("break").value) * 60;
+      let progress = (timeLeft / total) * 100;
+      document.getElementById("progress-bar").style.width = progress + "%";
+
+      timeLeft--;
+      if (timeLeft < 0) {
+        clearInterval(timerInterval);
+        document.getElementById("alarm").play();
+        alert(isWork ? "Work session finished! Time for a break." : "Break finished! Back to work.");
+        if (isWork) {
+          stats++;
+          localStorage.setItem("pomodoroCount", stats);
+          document.getElementById("stats").textContent = stats;
+        }
+        isWork = !isWork;
+        timeLeft = undefined;
+        startTimer();
+      }
     }
-  });
-</script>
 
+    function pauseTimer() { clearInterval(timerInterval); }
+    function resetTimer() {
+      clearInterval(timerInterval);
+      let minutes = document.getElementById("work").value;
+      timeLeft = minutes * 60;
+      document.getElementById("timer").textContent = `${minutes}:00`;
+      document.getElementById("progress-bar").style.width = "100%";
+      isWork = true;
+    }
+
+    function toggleTheme() {
+      let body = document.body;
+      let switchEl = document.getElementById("themeSwitch");
+      if (switchEl.checked) {
+        body.className = "dark";
+      } else {
+        body.className = "light";
+      }
+    }
+
+    function resetStats() {
+      stats = 0;
+      localStorage.setItem("pomodoroCount", stats);
+      document.getElementById("stats").textContent = stats;
+    }
+
+        // Auto-update timer when durations change
+    document.getElementById("work").addEventListener("input", () => {
+      if (isWork) {
+        timeLeft = document.getElementById("work").value * 60;
+        document.getElementById("timer").textContent = `${document.getElementById("work").value}:00`;
+        document.getElementById("progress-bar").style.width = "100%";
+      }
+    });
+
+    document.getElementById("break").addEventListener("input", () => {
+      if (!isWork) {
+        timeLeft = document.getElementById("break").value * 60;
+        document.getElementById("timer").textContent = `${document.getElementById("break").value}:00`;
+        document.getElementById("progress-bar").style.width = "100%";
+      }
+    });
+
+    // Zoom controls
+    let scale = 1;
+    function zoomIn() {
+      scale += 0.1;
+      document.getElementById("app").style.transform = `scale(${scale})`;
+      document.getElementById("app").style.transformOrigin = "top center";
+    }
+    function zoomOut() {
+      if (scale > 0.5) {
+        scale -= 0.1;
+        document.getElementById("app").style.transform = `scale(${scale})`;
+        document.getElementById("app").style.transformOrigin = "top center";
+      }
+    }
+  </script>
 </body>
 </html>
