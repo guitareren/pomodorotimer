@@ -8,7 +8,8 @@
       font-family: Arial, sans-serif; 
       text-align: center; 
       margin: 20px; 
-      transition: background 0.3s, color 0.3s; 
+      padding-top: 40px; /* Add space at the top */
+      transition: background 0.3s, color 0.3s, transform 0.3s;
     }
     #timer { font-size: 48px; margin: 20px; }
 
@@ -108,30 +109,27 @@
       background-color: #fff;
     }
 
-/* Progress bar styling */
-#progress-container {
-  width: 80%;
-  max-width: 600px;   /* Limit width on wide screens */
-  height: 20px;
-  background: #ddd;
-  border-radius: 10px;
-  margin: 20px auto;
-  overflow: hidden;
-}
-
-#progress-bar {
-  height: 100%;
-  width: 100%;
-  transition: width 1s linear, background 0.3s;
-}
-
-.light #progress-bar {
-  background: linear-gradient(135deg, #4cafef, #0077cc); /* Blue bar */
-}
-
-.dark #progress-bar {
-  background: linear-gradient(135deg, #6a1b9a, #4a148c); /* Dark purple bar */
-}
+    /* Progress bar styling */
+    #progress-container {
+      width: 80%;
+      max-width: 600px;   /* Limit width on wide screens */
+      height: 20px;
+      background: #ddd;
+      border-radius: 10px;
+      margin: 20px auto;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 100%;
+      transition: width 1s linear, background 0.3s;
+    }
+    .light #progress-bar {
+      background: linear-gradient(135deg, #4cafef, #0077cc); /* Blue bar */
+    }
+    .dark #progress-bar {
+      background: linear-gradient(135deg, #6a1b9a, #4a148c); /* Dark purple bar */
+    }
   </style>
 </head>
 <body class="dark"> <!-- Start in dark mode -->
@@ -161,12 +159,17 @@
   <button onclick="pauseTimer()">Pause</button>
   <button onclick="resetTimer()">Reset</button>
   <button onclick="resetStats()">Reset Pomodoro Count</button>
+  <br><br>
+  <!-- UI scaling buttons -->
+  <button onclick="zoomIn()">Zoom In</button>
+  <button onclick="zoomOut()">Zoom Out</button>
   
   <p>Completed Pomodoros: <span id="stats">0</span></p>
   
   <audio id="alarm" src="alarm.mp3"></audio>
   
-  <script>
+
+<script>
     let timerInterval, timeLeft, isWork = true;
     let stats = localStorage.getItem("pomodoroCount") || 0;
     document.getElementById("stats").textContent = stats;
@@ -229,6 +232,21 @@
       localStorage.setItem("pomodoroCount", stats);
       document.getElementById("stats").textContent = stats;
     }
-  </script>
+
+    // Zoom controls
+    let scale = 1;
+    function zoomIn() {
+      scale += 0.1;
+      document.body.style.transform = `scale(${scale})`;
+      document.body.style.transformOrigin = "top center";
+    }
+    function zoomOut() {
+      if (scale > 0.5) { // prevent shrinking too much
+        scale -= 0.1;
+        document.body.style.transform = `scale(${scale})`;
+        document.body.style.transformOrigin = "top center";
+      }
+    }
+</script>
 </body>
 </html>
