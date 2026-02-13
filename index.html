@@ -279,27 +279,34 @@
         let stats = localStorage.getItem("pomodoroCount") || 0;
         document.getElementById("stats").textContent = stats;
 
+        let startTime; // gerçek zaman için başlangıç zamanı
+
         function startTimer() {
             if (timeLeft === undefined || timeLeft <= 0) {
                 let minutes = isWork ? document.getElementById("work").value : document.getElementById("break").value;
                 timeLeft = minutes * 60;
                 updateStateLabel();
-
             }
             clearInterval(timerInterval);
+            startTime = Date.now(); // başlangıç zamanı kaydet
             timerInterval = setInterval(updateTimer, 1000);
         }
 
         function updateTimer() {
-            let mins = Math.floor(timeLeft / 60);
-            let secs = timeLeft % 60;
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            let remaining = timeLeft - elapsed;
+
+            if (remaining < 0) remaining = 0;
+
+            let mins = Math.floor(remaining / 60);
+            let secs = remaining % 60;
             document.getElementById("timer").textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 
             let total = (isWork ? document.getElementById("work").value : document.getElementById("break").value) * 60;
-            let progress = (timeLeft / total) * 100;
+            let progress = (remaining / total) * 100;
             document.getElementById("progress-bar").style.width = progress + "%";
-            timeLeft--;
-            if (timeLeft < 0) {
+
+            if (remaining <= 0) {
                 clearInterval(timerInterval);
                 document.getElementById("alarm").play();
                 alert(isWork ? "Work session finished! Time for a break." : "Break finished! Back to work.");
@@ -316,7 +323,13 @@
             }
         }
 
-        function pauseTimer() { clearInterval(timerInterval); }
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            // kalan süreyi güncelle
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            timeLeft = timeLeft - elapsed;
+        }
+
         function resetTimer() {
             clearInterval(timerInterval);
             let minutes = document.getElementById("work").value;
@@ -379,7 +392,6 @@
 
         window.onload = () => {
             let switchEl = document.getElementById("themeSwitch");
-            // Eğer body class dark ise switch checked olsun
             updateStateLabel();
             if (document.body.classList.contains("dark")) {
                 switchEl.checked = true;
@@ -400,10 +412,6 @@
                 breakLabel.style.display = "inline-block";
             }
         }
-
-
-
-
     </script>
 </body>
 
