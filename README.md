@@ -15,6 +15,7 @@ https://guitareren.github.io/pomodorotimer/
 - **Theme switcher** (Light / Dark mode)
 - **Pomodoro count tracking** (saved in local storage)
 - Modern UI with styled buttons and inputs
+- Real‑time timer using `Date.now()` (continues accurately even if the device screen is turned off or the browser tab is inactive)
 
 ---
 
