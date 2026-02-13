@@ -261,8 +261,7 @@
             <div id="progress-bar"></div>
         </div>
 
-        <button onclick="startTimer()">Start</button>
-        <button onclick="pauseTimer()">Pause</button>
+        <button id="toggleBtn" onclick="toggleTimer()">Start</button>
         <button onclick="resetTimer()">Reset</button>
         <button onclick="resetStats()">Reset Pomodoro Count</button>
         <br><br>
@@ -276,6 +275,7 @@
 
     <script>
         let timerInterval, timeLeft, isWork = true;
+        let isRunning = false;
         let stats = localStorage.getItem("pomodoroCount") || 0;
         document.getElementById("stats").textContent = stats;
 
@@ -330,6 +330,20 @@
             timeLeft = timeLeft - elapsed;
         }
 
+        function toggleTimer() {
+            if (isRunning) {
+                // şu anda çalışıyor → durdur
+                pauseTimer();
+                isRunning = false;
+                document.getElementById("toggleBtn").textContent = "Start";
+            } else {
+                // şu anda duruyor → başlat
+                startTimer();
+                isRunning = true;
+                document.getElementById("toggleBtn").textContent = "Pause";
+            }
+        }
+
         function resetTimer() {
             clearInterval(timerInterval);
             let minutes = document.getElementById("work").value;
@@ -338,6 +352,9 @@
             document.getElementById("progress-bar").style.width = "100%";
             isWork = true;
             updateStateLabel();
+            isRunning = false;
+            document.getElementById("toggleBtn").textContent = "Start";
+
         }
 
         function toggleTheme() {
